@@ -1,5 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
+<head>
+  <meta charset="UTF-8" /><!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Neutron Star</title>
@@ -153,8 +157,7 @@
       margin-bottom: 20px;
     }
 
-    #settings-screen input[type="color"], 
-    #settings-screen input[type="text"] {
+    #settings-screen input[type="color"] {
       padding: 10px;
       margin-bottom: 20px;
       font-size: 16px;
@@ -171,26 +174,6 @@
 
     #close-settings-btn:hover {
       background-color: #45a049;
-    }
-
-    #panic-button {
-      position: fixed;
-      bottom: 10px;
-      right: 10px;
-      background-color: red;
-      color: white;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      z-index: 10000;
-      box-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
-    }
-
-    #panic-button:hover {
-      background-color: darkred;
     }
   </style>
 </head>
@@ -209,24 +192,29 @@
     let currentBgColor = "black";
     let inGameUI = false;
     let loggedInUsername = "";
-    let panicKey = null;
-
     const webhookUrl = "https://discord.com/api/webhooks/1369038865804824686/ARuFGJNLGAA47UM9kqocFE6zlFmhPRyxAzEgsy1PM_4FNzktR0gmpJ3KVMuBSN957mpN";
-
+  // ADD USERS HERE ADD USERS HERE ADD USERS HERE ADD USERS HERE ADD USERS HERE ADD USERS HERE ADD USERS HERE ADD USERS HERE ADD USERS HERE ADD USERS HERE ADD USERS HERE ADD USERS HERE 
     const users = [
-      { username: "Woh", password: "Anything" },
-      { username: "qwiki", password: "252500" },
-      { username: "electron", password: "0909" },
-      { username: "Genghis", password: "Khan" },
-      { username: "Vas", password: "*PASSWORD_HERE*" }
+      { username: "Solix", password: "1212" },
+      { username: "Sigma", password: "Sigma" },
+      { username: "Woh", password: "Anything" }
     ];
 
     function sendWebhookMessage(message) {
       fetch(webhookUrl, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({ content: message })
-      }).catch(error => console.error("Webhook error:", error));
+      }).catch(error => {
+        console.error("Error sending message to Discord webhook:", error);
+      });
+    }
+
+    function addUser(username, password) {
+      users.push({ username, password });
+      console.log(`User added: ${username}`);
     }
 
     function showLoginForm() {
@@ -238,6 +226,7 @@
     function submitLogin() {
       const email = document.getElementById('email-input').value;
       const password = document.getElementById('password-input').value;
+
       const user = users.find(u => u.username === email && u.password === password);
 
       if (user) {
@@ -274,15 +263,20 @@
         <div id="settings-tab" onclick="goToSettings()">⚙️ Settings</div>
         <div class="screen-container">
           <div class="game-grid">
+            <button class="game-button" onclick="openGame('Website.com', 'Name here')">Name here</button>
             <button class="game-button" onclick="openGame('https://archive.org/details/stick-rpg-complete', 'Stick RPG')">Stick RPG</button>
             <button class="game-button" onclick="openGame('https://1games.io/game/monkey-mart/', 'Monkey Mart')">Monkey Mart</button>
             <button class="game-button" onclick="openGame('https://eaglercraft.com', 'Minecraft')">Minecraft</button>
-            <button class="game-button" onclick="openGame('https://onlinegames.io', 'Bad Game But a Lot')">Bad Game But a Lot</button>
-            <button class="game-button" onclick="openGame('https://sz-games.github.io', 'Bad Game But a Lot 2')">Bad Game But a Lot 2</button>
+            <button class="game-button" onclick="openGame('https://onlinegames.io', 'OnlineGames')">OnlineGames</button>
+            <button class="game-button" onclick="openGame('https://sz-games.github.io', 'Sz Games')">Sz Games</button>
             <button class="game-button" onclick="openGame('https://slopeonline.online/', 'Slope')">Slope</button>
-          </div>
+            <button class="game-button" onclick="openGame('https://retrobowl.me', 'retro bowl')">Retro bowl</button>
+            <button class="game-button" onclick="openGame('https://gamesfrog.com/games/madden', 'madden 7')">Madden 7</button>
+            <button class="game-button" onclick="openGame('https://crazycattle3dgame.github.io/', 'crazycattle3d')">crazy cattle 3d</button>
+            <button class="game-button" onclick="openGame('https://www.miniplay.com/game/plants-vs-zombies', 'plants-vs-zombies')">Plants vs Zombies</button>
+
+          </div> 
         </div>
-        <button id="panic-button" onclick="activatePanic()">Panic!</button>
       `;
     }
 
@@ -308,11 +302,6 @@
       }
     }
 
-    function activatePanic() {
-      sendWebhookMessage(`${loggedInUsername} activated the PANIC button!`);
-      window.location.href = "https://www.google.com";
-    }
-
     function goToSettings() {
       sendWebhookMessage(`${loggedInUsername} opened settings.`);
       const settingsScreen = document.createElement('div');
@@ -320,39 +309,31 @@
       settingsScreen.innerHTML = `
         <h2>Settings</h2>
         <label for="bg-color-picker">Background Color:</label>
-        <input type="color" id="bg-color-picker" value="${currentBgColor}" />
-        <br />
-        <label for="panic-key">Set Panic Key:</label>
-        <input type="text" id="panic-key" maxlength="1" placeholder="e.g. P" />
-        <br />
+        <input type="color" id="bg-color-picker" value="#000000" />
         <button id="close-settings-btn" onclick="closeSettings()">Close</button>
       `;
       document.body.appendChild(settingsScreen);
 
       document.getElementById('bg-color-picker').addEventListener('input', function (event) {
-        currentBgColor = event.target.value;
-        document.documentElement.style.backgroundColor = currentBgColor;
-        document.body.style.backgroundColor = currentBgColor;
-      });
-
-      document.getElementById('panic-key').addEventListener('input', function (event) {
-        panicKey = event.target.value.toLowerCase();
-        sendWebhookMessage(`${loggedInUsername} set panic key to '${panicKey}'`);
+        const color = event.target.value;
+        currentBgColor = color;
+        document.documentElement.style.backgroundColor = color;
+        document.body.style.backgroundColor = color;
       });
     }
 
     function closeSettings() {
       sendWebhookMessage(`${loggedInUsername} closed settings.`);
       const settingsScreen = document.getElementById('settings-screen');
-      if (settingsScreen) settingsScreen.remove();
+      settingsScreen.remove();
     }
-
-    // Listen for key press to trigger panic (if set)
-    document.addEventListener('keydown', function (event) {
-      if (inGameUI && panicKey && event.key.toLowerCase() === panicKey) {
-        activatePanic();
-      }
-    });
   </script>
 </body>
 </html>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+  <title>Browser</title>
+</head>
+
+<body>
